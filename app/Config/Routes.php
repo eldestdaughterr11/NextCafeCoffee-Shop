@@ -41,20 +41,27 @@ $routes->post('customer/wishlist/remove', 'Customer::removeFromWishlist');
 $routes->post('customer/review/submit', 'Customer::submitReview');
 $routes->post('customer/review/delete/(:num)', 'Customer::deleteReview/$1');
 
-$routes->get('admin', 'Admin::dashboard');
-$routes->get('admin/dashboard', 'Admin::dashboard');
-$routes->get('admin/profile', 'Admin::profile');
-$routes->get('admin/delete/(:num)', 'Admin::deleteUser/$1');
-
-// Admin Product Management
-$routes->get('admin/products/add', 'Admin::addProduct');
-$routes->post('admin/products/store', 'Admin::storeProduct');
-$routes->get('admin/products/edit/(:num)', 'Admin::editProduct/$1');
-$routes->post('admin/products/update/(:num)', 'Admin::updateProduct/$1');
-$routes->get('admin/products/delete/(:num)', 'Admin::deleteProduct/$1');
-
-// Admin Order Management
-$routes->post('admin/orders/update', 'Admin::updateOrderStatus');
+$routes->group('admin', ['filter' => 'auth'], function($routes) {
+    $routes->get('/', 'Admin::dashboard');
+    $routes->get('dashboard', 'Admin::dashboard');
+    $routes->get('products', 'Admin::products');
+    $routes->get('profile', 'Admin::profile');
+    $routes->get('delete/(:num)', 'Admin::deleteUser/$1');
+    
+    // Admin Product Management
+    $routes->get('products/add', 'Admin::addProduct');
+    $routes->post('products/store', 'Admin::storeProduct');
+    $routes->get('products/edit/(:num)', 'Admin::editProduct/$1');
+    $routes->post('products/update/(:num)', 'Admin::updateProduct/$1');
+    $routes->get('products/delete/(:num)', 'Admin::deleteProduct/$1');
+    
+    // Admin Category Management
+    $routes->get('categories', 'Admin::categories');
+    
+    // Admin Order Management
+    $routes->get('orders', 'Admin::orders');
+    $routes->post('orders/update', 'Admin::updateOrderStatus');
+});
 
 $routes->get('testdb', 'TestDB::index');
 $routes->get('send-email', 'EmailController::send');

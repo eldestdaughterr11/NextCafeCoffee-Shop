@@ -8,13 +8,6 @@ class Admin extends BaseController
     {
         $session = session();
 
-        // TEMPORARILY DISABLED LOGIN CHECK FOR CONVENIENCE
-        /*
-        if (!$session->get('logged_in') || $session->get('role') != 'admin') {
-            return redirect()->to(site_url('login'));
-        }
-        */
-
         $db = \Config\Database::connect();
 
         // Stats fetching
@@ -61,13 +54,78 @@ class Admin extends BaseController
             ];
         }
 
+        // Unique categories count
+        $total_categories = $db->table('products')
+            ->select('category')
+            ->distinct()
+            ->countAllResults();
+
         return view('admin/dashboard', [
             'total_revenue' => $total_revenue,
             'total_orders' => $total_orders,
             'total_customers' => $total_customers,
             'total_products' => $total_products,
+            'total_categories' => $total_categories,
             'products' => $products,
             'recent_orders' => $recent_orders,
+            'user' => $user
+        ]);
+    }
+
+    public function products()
+    {
+        $session = session();
+        $db = \Config\Database::connect();
+        $products = $db->table('products')->get()->getResult();
+        
+        // Fetch categories for filtering (demo)
+        $categories = $db->table('products')->select('category')->distinct()->get()->getResult();
+
+        // Admin info
+        $user = $db->table('users')->where('id', $session->get('user_id'))->get()->getRow();
+
+        return view('admin/products/index', [
+            'products' => $products,
+            'categories' => $categories,
+            'user' => $user
+        ]);
+    }
+
+    public function orders()
+    {
+        $session = session();
+        $db = \Config\Database::connect();
+        $orders = $db->table('orders')
+            ->select('orders.*, users.username as customer_name')
+            ->join('users', 'users.id = orders.user_id')
+            ->orderBy('created_at', 'DESC')
+            ->get()
+            ->getResult();
+
+        // Admin info
+        $user = $db->table('users')->where('id', $session->get('user_id'))->get()->getRow();
+
+        return view('admin/orders', [
+            'orders' => $orders,
+            'user' => $user
+        ]);
+    }
+
+    public function categories()
+    {
+        $session = session();
+        $db = \Config\Database::connect();
+        $categories = $db->table('products')
+            ->select('category, COUNT(*) as product_count')
+            ->groupBy('category')
+            ->get()
+            ->getResult();
+
+        // Admin info
+        $user = $db->table('users')->where('id', $session->get('user_id'))->get()->getRow();
+
+        return view('admin/categories', [
+            'categories' => $categories,
             'user' => $user
         ]);
     }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - NextCafe</title>
+    <title>Order Management - NextCafe</title>
     <link rel="stylesheet" href="<?= base_url('css/admin.css') ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
 </head>
@@ -13,7 +13,7 @@
 
     <div class="main-wrapper">
         <div class="header-top">
-            <h1>Admin Dashboard</h1>
+            <h1>Order Management</h1>
             <div class="header-right">
                 <div class="current-date">
                     <i class="far fa-calendar"></i> <?= date('M j, Y') ?>
@@ -27,51 +27,32 @@
         </div>
 
         <div class="content-container">
-            <div class="dashboard-stats" style="grid-template-columns: repeat(4, 1fr);">
-                <div class="stat-card" style="background: #ffffff; color: #181c32; border: 1px solid var(--border);">
-                    <div>
-                        <div class="label" style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Revenue</div>
-                        <div class="value" style="font-size: 1.5rem; color: #181c32;">₱<?= number_format($total_revenue, 2) ?></div>
-                    </div>
-                </div>
-
-                <div class="stat-card" style="background: #ffffff; color: #181c32; border: 1px solid var(--border);">
-                    <div>
-                        <div class="label" style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Orders</div>
-                        <div class="value" style="font-size: 1.5rem; color: #181c32;"><?= $total_orders ?></div>
-                    </div>
-                    <a href="<?= base_url('admin/orders') ?>" class="view-link" style="color: var(--primary);">View All &rarr;</a>
-                </div>
-
-                <div class="stat-card blue">
-                    <div>
-                        <div class="label">Products</div>
-                        <div class="value" style="font-size: 1.5rem;"><?= $total_products ?></div>
-                    </div>
-                    <a href="<?= base_url('admin/products') ?>" class="view-link">View Details &rarr;</a>
-                </div>
-
-                <div class="stat-card green">
-                    <div>
-                        <div class="label">Customers</div>
-                        <div class="value" style="font-size: 1.5rem;"><?= $total_customers ?></div>
-                    </div>
-                    <a href="<?= base_url('admin/categories') ?>" class="view-link">View Details &rarr;</a>
-                </div>
-            </div>
-
-            <div class="quick-actions">
-                <h3>Quick Actions</h3>
-                <div class="action-buttons">
-                    <a href="<?= base_url('admin/products/add') ?>" class="btn-outline btn-outline-primary">Add New Product</a>
-                    <a href="#" class="btn-outline btn-outline-success">Add New Category</a>
-                </div>
-            </div>
-
-            <!-- Recent Orders Section -->
-            <div class="card-wrapper" id="orders" style="margin-top: 3rem;">
+            <div class="card-wrapper">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <h2 style="font-size: 1.25rem; font-weight: 700;">Recent Orders</h2>
+                    <h2 style="font-size: 1.25rem; font-weight: 700;">All Orders</h2>
+                </div>
+
+                <div class="table-header">
+                    <div class="search-filter">
+                        <div class="search-input">
+                            <i class="fas fa-search icon"></i>
+                            <input type="text" placeholder="Search order ID or customer...">
+                        </div>
+                        <select class="filter-select">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <select class="filter-select">
+                            <option value="">Sort by</option>
+                            <option value="newest">Newest First</option>
+                            <option value="amount">Amount</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn-primary" style="padding: 0.65rem 1.5rem;">Apply</button>
+                    </div>
                 </div>
 
                 <div style="overflow-x: auto;">
@@ -83,18 +64,19 @@
                                 <th>Date</th>
                                 <th>Amount</th>
                                 <th>Status</th>
-                                <th>Update</th>
+                                <th>Update Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (empty($recent_orders)): ?>
-                                <tr><td colspan="6" style="text-align: center; padding: 3rem;">No recent orders.</td></tr>
+                            <?php if (empty($orders)): ?>
+                                <tr><td colspan="7" style="text-align: center; padding: 3rem;">No orders found.</td></tr>
                             <?php else: ?>
-                                <?php foreach ($recent_orders as $order): ?>
+                                <?php foreach ($orders as $order): ?>
                                     <tr>
                                         <td style="font-weight: 600;">#<?= $order->id ?></td>
                                         <td><?= esc($order->customer_name) ?></td>
-                                        <td style="color: var(--text-muted);"><?= date('M j, Y', strtotime($order->created_at)) ?></td>
+                                        <td style="color: var(--text-muted);"><?= date('M j, Y h:i A', strtotime($order->created_at)) ?></td>
                                         <td style="font-weight: 600;">₱<?= number_format($order->total_amount, 2) ?></td>
                                         <td>
                                             <span class="badge <?= $order->status == 'completed' ? 'badge-success' : ($order->status == 'pending' ? 'badge-warning' : 'badge-danger') ?>" style="text-transform: capitalize;">
@@ -104,12 +86,19 @@
                                         <td>
                                             <form action="<?= site_url('admin/orders/update') ?>" method="POST" style="display: flex; align-items: center;">
                                                 <input type="hidden" name="order_id" value="<?= $order->id ?>">
-                                                <select name="status" onchange="this.form.submit()" class="filter-select" style="padding: 0.35rem; font-size: 0.8rem; min-width: 110px;">
+                                                <select name="status" onchange="this.form.submit()" class="filter-select" style="padding: 0.35rem; font-size: 0.8rem; min-width: 120px;">
                                                     <option value="pending" <?= $order->status == 'pending' ? 'selected' : '' ?>>Pending</option>
                                                     <option value="completed" <?= $order->status == 'completed' ? 'selected' : '' ?>>Completed</option>
                                                     <option value="cancelled" <?= $order->status == 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
                                                 </select>
                                             </form>
+                                        </td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <a href="#" class="btn-icon btn-cyan" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
