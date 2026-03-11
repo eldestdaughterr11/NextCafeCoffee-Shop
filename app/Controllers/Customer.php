@@ -11,7 +11,12 @@ class Customer extends BaseController
         }
 
         $db = \Config\Database::connect();
-        $coffees = $db->table('products')->where('status', 'available')->get()->getResult();
+        $coffees = $db->table('products')
+            ->select('products.*')
+            ->join('categories', 'categories.name = products.category')
+            ->where('products.status', 'available')
+            ->where('categories.status', 'active')
+            ->get()->getResult();
         
         // Load wishlist
         $wishlistModel = new \App\Models\WishlistModel();
@@ -21,8 +26,12 @@ class Customer extends BaseController
         // Get only first 3 wishlist items for dashboard preview
         $wishlistPreview = array_slice($wishlistItems, 0, 3);
         
+        // Get active categories for Quick Links
+        $categories = $db->table('categories')->where('status', 'active')->orderBy('name')->get()->getResult();
+        
         return view('customer/dashboard', [
             'coffees' => $coffees,
+            'categories' => $categories,
             'wishlistItems' => $wishlistPreview,
             'wishlistCount' => count($wishlistItems)
         ]);
@@ -91,6 +100,62 @@ class Customer extends BaseController
 
         return view('customer/profile', ['user' => $user]);
     }
+
+    public function updateProfile()
+    {
+        if (!session()->get('logged_in') || session()->get('role') != 'customer') {
+            return redirect()->to(site_url('login'));
+        }
+
+        $db = \Config\Database::connect();
+        $userId = session()->get('user_id');
+        $user = $db->table('users')->where('id', $userId)->get()->getRow();
+
+        $currentPassword = $this->request->getPost('current_password');
+
+        // Support both MD5 (legacy) and bcrypt passwords — mirrors login logic
+        $validPassword = false;
+        if (strlen($user->password) == 32) {
+            $validPassword = md5($currentPassword) === $user->password;
+        } else {
+            $validPassword = password_verify($currentPassword, $user->password);
+        }
+
+        if (!$validPassword) {
+            return redirect()->to(site_url('customer/profile'))
+                ->with('profile_error', 'Incorrect current password. No changes were saved.');
+        }
+
+        $data = [
+            'name'       => $this->request->getPost('name'),
+            'username'   => $this->request->getPost('username'),
+            'email'      => $this->request->getPost('email'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+
+        // Handle optional password change; always store as bcrypt
+        $newPassword = $this->request->getPost('new_password');
+        $confirmPassword = $this->request->getPost('confirm_password');
+
+        if (!empty($newPassword)) {
+            if ($newPassword !== $confirmPassword) {
+                return redirect()->to(site_url('customer/profile'))
+                    ->with('profile_error', 'New passwords do not match. No changes were saved.');
+            }
+            $data['password'] = password_hash($newPassword, PASSWORD_DEFAULT);
+        } elseif (strlen($user->password) == 32) {
+            // Silently upgrade legacy MD5 password to bcrypt using the confirmed current password
+            $data['password'] = password_hash($currentPassword, PASSWORD_DEFAULT);
+        }
+
+        $db->table('users')->where('id', $userId)->update($data);
+
+        // Keep session in sync with new username
+        session()->set('username', $data['username']);
+
+        return redirect()->to(site_url('customer/profile'))
+            ->with('profile_success', 'Your profile has been updated successfully!');
+    }
     public function menu()
     {
         $db = \Config\Database::connect();
@@ -101,16 +166,18 @@ class Customer extends BaseController
         $selected_category = $this->request->getGet('category') ?? 'all';
 
         // Get all available categories for sidebar
-        $categories = $db->table('products')
-            ->select('category')
-            ->distinct()
-            ->where('status', 'available')
-            ->orderBy('category')
+        $categories = $db->table('categories')
+            ->where('status', 'active')
+            ->orderBy('name')
             ->get()
             ->getResult();
 
-        // Build product query
-        $products_table = $db->table('products')->where('status', 'available');
+        // Build product query, filtering by products available AND category active
+        $products_table = $db->table('products')
+            ->select('products.*')
+            ->join('categories', 'categories.name = products.category')
+            ->where('products.status', 'available')
+            ->where('categories.status', 'active');
 
         // Apply search filter
         if (!empty($search)) {
@@ -148,8 +215,11 @@ class Customer extends BaseController
     {
         $db = \Config\Database::connect();
         $product = $db->table('products')
-            ->where('slug', $slug)
-            ->where('status', 'available')
+            ->select('products.*')
+            ->join('categories', 'categories.name = products.category')
+            ->where('products.slug', $slug)
+            ->where('products.status', 'available')
+            ->where('categories.status', 'active')
             ->get()
             ->getRow();
 
@@ -256,21 +326,38 @@ class Customer extends BaseController
         // Get cart from session
         $cart = $session->get('cart') ?? [];
 
-        // Normalize items: make sure all required keys exist
+        $db = \Config\Database::connect();
+        
+        // Normalize items and fetch latest info from DB
         foreach ($cart as $pid => $item) {
-            if (!isset($item['product_name'])) {
-                $cart[$pid]['product_name'] = $item['name'] ?? 'Unnamed';
-            }
-            if (!isset($item['image_url'])) {
-                $cart[$pid]['image_url'] = $item['image'] ?? 'images/default.jpg';
-            }
-            if (!isset($item['price'])) {
-                $cart[$pid]['price'] = $item['price'] ?? 0;
-            }
-            if (!isset($item['quantity'])) {
-                $cart[$pid]['quantity'] = $item['quantity'] ?? 1;
+            $liveProduct = $db->table('products')
+                ->select('products.*')
+                ->join('categories', 'categories.name = products.category', 'left')
+                ->where('products.id', $pid)
+                ->where('products.status', 'available')
+                ->where('categories.status', 'active')
+                ->get()->getRow();
+            
+            if ($liveProduct) {
+                // Update session cart with latest database values
+                $cart[$pid]['product_name'] = $liveProduct->product_name;
+                $cart[$pid]['name'] = $liveProduct->product_name;
+                $cart[$pid]['image'] = $liveProduct->image_url;
+                $cart[$pid]['image_url'] = $liveProduct->image_url;
+                // Optional: update price too, so cart reflects live price changes
+                $cart[$pid]['price'] = $liveProduct->price;
+                
+                if (!isset($item['quantity'])) {
+                    $cart[$pid]['quantity'] = $item['quantity'] ?? 1;
+                }
+            } else {
+                // Remove from cart if product becomes unavailable or category is inactive
+                unset($cart[$pid]);
             }
         }
+        
+        // Save the refreshed data back to session
+        $session->set('cart', $cart);
 
         $cart_count = array_sum(array_column($cart, 'quantity'));
 

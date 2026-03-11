@@ -95,8 +95,11 @@
                                         </td>
                                         <td>
                                             <div class="action-btns">
-                                                <a href="#" class="btn-icon btn-cyan" title="View Details">
-                                                    <i class="fas fa-eye"></i>
+                                                <a href="<?= base_url('admin/orders/details/' . $order->id) ?>" class="btn-icon btn-cyan" style="background-color: #00bcd4; color: white; width: 32px; height: 32px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center;" title="View Details">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                                </a>
+                                                <a href="<?= base_url('admin/orders/delete/' . $order->id) ?>" class="btn-icon" style="background-color: #c0392b; color: white; width: 32px; height: 32px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center;" title="Delete" onclick="return confirm('Are you sure you want to permanently delete Order #<?= $order->id ?>? This cannot be undone.')">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg>
                                                 </a>
                                             </div>
                                         </td>

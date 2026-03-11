@@ -24,11 +24,9 @@
             <div class="form-group">
                 <label>Category</label>
                 <select name="category" class="form-control" required>
-                    <option value="Espresso">Espresso</option>
-                    <option value="Milk Based">Milk Based</option>
-                    <option value="Cold Brew">Cold Brew</option>
-                    <option value="Pastries">Pastries</option>
-                    <option value="Frappe">Frappe</option>
+                    <?php foreach ($categories as $cat): ?>
+                        <option value="<?= esc($cat->name) ?>"><?= esc($cat->name) ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div class="form-group">

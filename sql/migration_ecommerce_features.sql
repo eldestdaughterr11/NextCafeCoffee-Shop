@@ -1,6 +1,13 @@
--- Migration for E-commerce Features
+-- ============================================
+-- Migration: E-commerce Features
 -- Reviews, Wishlist, and Order Tracking
--- Generated on 2026-02-04
+-- For phpMyAdmin - Run AFTER nextcafe_ecomms.sql
+-- ============================================
+-- 
+-- NOTE: If you imported nextcafe_ecomms.sql (the complete schema),
+--       you do NOT need to run this file separately.
+--       This is only needed if you are upgrading an existing database.
+-- ============================================
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;

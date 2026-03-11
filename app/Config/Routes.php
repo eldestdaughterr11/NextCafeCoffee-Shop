@@ -21,6 +21,7 @@ $routes->group('customer', ['filter' => 'customer_auth'], function($routes) {
     $routes->get('logout', 'Auth::logout');
     $routes->get('dashboard', 'Customer::dashboard');
     $routes->get('profile', 'Customer::profile');
+    $routes->post('profile/update', 'Customer::updateProfile');
     $routes->get('product/(:segment)', 'Customer::viewProduct/$1');
     $routes->get('coffee/(:num)', 'Customer::selectCoffee/$1');
     $routes->get('menu', 'Customer::menu');
@@ -51,6 +52,13 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
     $routes->get('dashboard', 'Admin::dashboard');
     $routes->get('products', 'Admin::products');
     $routes->get('profile', 'Admin::profile');
+    
+    // Admin User Management
+    $routes->get('users', 'Admin::users');
+    $routes->get('users/edit/(:num)', 'Admin::editUser/$1');
+    $routes->post('users/update/(:num)', 'Admin::updateUser/$1');
+    $routes->get('users/toggle/(:num)', 'Admin::toggleUserStatus/$1');
+    $routes->get('users/delete/(:num)', 'Admin::deleteUser/$1');
     $routes->get('delete/(:num)', 'Admin::deleteUser/$1');
     
     // Admin Product Management
@@ -59,12 +67,21 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
     $routes->get('products/edit/(:num)', 'Admin::editProduct/$1');
     $routes->post('products/update/(:num)', 'Admin::updateProduct/$1');
     $routes->get('products/delete/(:num)', 'Admin::deleteProduct/$1');
+    $routes->get('products/toggle/(:num)', 'Admin::toggleProductStatus/$1');
     
     // Admin Category Management
     $routes->get('categories', 'Admin::categories');
+    $routes->get('categories/add', 'Admin::addCategory');
+    $routes->post('categories/store', 'Admin::storeCategory');
+    $routes->get('categories/edit/(:num)', 'Admin::editCategory/$1');
+    $routes->post('categories/update/(:num)', 'Admin::updateCategory/$1');
+    $routes->get('categories/delete/(:num)', 'Admin::deleteCategory/$1');
+    $routes->get('categories/toggle/(:num)', 'Admin::toggleCategoryStatus/$1');
     
     // Admin Order Management
     $routes->get('orders', 'Admin::orders');
+    $routes->get('orders/details/(:num)', 'Admin::orderDetail/$1');
+    $routes->get('orders/delete/(:num)', 'Admin::deleteOrder/$1');
     $routes->post('orders/update', 'Admin::updateOrderStatus');
     
     $routes->get('logout', 'Auth::logout');

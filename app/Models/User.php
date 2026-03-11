@@ -20,6 +20,8 @@ class User extends Model
         'password',
         'picture',
         'bio',
+        'role',
+        'status',
         'created_at',
         'updated_at',
         'deleted_at'

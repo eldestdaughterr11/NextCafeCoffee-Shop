@@ -229,7 +229,7 @@
     <div class="main-wrapper" style="background: #f8f9fa;">
         <div class="header-top">
             <a href="<?= site_url('customer/menu') ?>" style="text-decoration: none; color: #666; font-weight: 600;">← Back to Menu</a>
-            <div class="user-avatar"><?= strtoupper(substr(session()->get('username') ?? 'G', 0, 1)) ?></div>
+            <a href="<?= base_url('customer/profile') ?>" title="My Profile" style="text-decoration: none;"><div class="user-avatar"><?= strtoupper(substr(session()->get('username') ?? 'G', 0, 1)) ?></div></a>
         </div>
 
         <div class="detail-container">

@@ -62,6 +62,12 @@
                 </a>
             <?php endif; ?>
             
+            <a href="<?= base_url('customer/profile') ?>" class="nav-link">
+                <span class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </span>
+                My Profile
+            </a>
             <a href="javascript:void(0)" onclick="confirmLogout('<?= base_url('customer/logout') ?>')" class="nav-link" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;">
                 <span class="icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
@@ -83,7 +89,7 @@
                     <h1 style="margin: 0;">Martin Ore</h1>
                 </div>
             </div>
-            <div class="user-avatar"><?= strtoupper(substr(session()->get('username'), 0, 1)) ?></div>
+            <a href="<?= base_url('customer/profile') ?>" title="My Profile" style="text-decoration: none;"><div class="user-avatar"><?= strtoupper(substr(session()->get('username'), 0, 1)) ?></div></a>
         </div>
 
         <div class="hero-banner fade-in delay-1">
@@ -102,22 +108,20 @@
                     <h3>Explore Menu</h3>
                 </div>
                 <div class="quick-categories">
-                    <a href="<?= base_url('customer/menu?category=espresso') ?>" class="category-card">
-                        <span class="cat-emoji">☕</span>
-                        <div class="cat-name">Espresso</div>
-                    </a>
-                    <a href="<?= base_url('customer/menu?category=iced') ?>" class="category-card">
-                        <span class="cat-emoji">🥤</span>
-                        <div class="cat-name">Iced</div>
-                    </a>
-                    <a href="<?= base_url('customer/menu?category=pastry') ?>" class="category-card">
-                        <span class="cat-emoji">🥐</span>
-                        <div class="cat-name">Snacks</div>
-                    </a>
-                    <a href="<?= base_url('customer/menu?category=special') ?>" class="category-card">
-                        <span class="cat-emoji">✨</span>
-                        <div class="cat-name">Specials</div>
-                    </a>
+                    <?php foreach ($categories as $cat): ?>
+                        <?php 
+                            $categoryName = strtolower($cat->name);
+                            $icon = '🏷️';
+                            if (strpos($categoryName, 'espresso') !== false) $icon = '☕';
+                            if (strpos($categoryName, 'milk') !== false || strpos($categoryName, 'latte') !== false) $icon = '🥛';
+                            if (strpos($categoryName, 'cold') !== false || strpos($categoryName, 'brew') !== false) $icon = '🥤';
+                            if (strpos($categoryName, 'pastr') !== false || strpos($categoryName, 'food') !== false) $icon = '🍰';
+                        ?>
+                        <a href="<?= base_url('customer/menu?category=' . urlencode($cat->name)) ?>" class="category-card">
+                            <span class="cat-emoji"><?= $icon ?></span>
+                            <div class="cat-name"><?= esc(ucfirst($cat->name)) ?></div>
+                        </a>
+                    <?php endforeach; ?>
                 </div>
 
                 <div class="section-title">
@@ -125,35 +129,30 @@
                     <a href="<?= base_url('customer/menu') ?>" style="font-size: 0.9rem; color: var(--accent); text-decoration: none;">See All</a>
                 </div>
                 <div class="featured-slider">
-                    <!-- Static Mock Data for Visuals (since we might not have 'popular' query yet) -->
-                    <div class="featured-item">
-                        <img src="<?= base_url('images/cappuccino.jpg') ?>" class="featured-img" alt="Cappuccino">
-                        <div class="featured-info">
-                            <h4>Cappuccino</h4>
-                            <div class="featured-price">₱140.00</div>
-                        </div>
-                    </div>
-                    <div class="featured-item">
-                        <img src="<?= base_url('images/blueberrymuffin.jpg') ?>" class="featured-img" alt="Muffin">
-                        <div class="featured-info">
-                            <h4>Blueberry Muffin</h4>
-                            <div class="featured-price">₱85.00</div>
-                        </div>
-                    </div>
-                    <div class="featured-item">
-                        <img src="<?= base_url('images/espresso.jpg') ?>" class="featured-img" alt="Espresso">
-                        <div class="featured-info">
-                            <h4>Espresso</h4>
-                            <div class="featured-price">₱120.00</div>
-                        </div>
-                    </div>
-                    <div class="featured-item">
-                        <div style="background: #f8f8f8; width: 80px; height: 80px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">🍫</div>
-                        <div class="featured-info">
-                            <h4>Chocolate Cookie</h4>
-                            <div class="featured-price">₱60.00</div>
-                        </div>
-                    </div>
+                    <?php if (!empty($coffees)): ?>
+                        <?php 
+                        $featuredItems = array_slice($coffees, 0, 4); 
+                        $defaultImages = [
+                            'Espresso' => 'images/espresso.jpg',
+                            'Cappuccino' => 'images/cappuccino.jpg',
+                            'Iced Americano' => 'images/iced_americano.png',
+                            'Caramel Latte' => 'images/caramel_latte.png',
+                            'Blueberry Muffin' => 'images/blueberrymuffin.jpg'
+                        ];
+                        ?>
+                        <?php foreach ($featuredItems as $featured): ?>
+                            <?php $imagePath = !empty($featured->image_url) ? $featured->image_url : ($defaultImages[$featured->product_name] ?? 'images/default.png'); ?>
+                            <div class="featured-item" onclick="window.location.href='<?= site_url("customer/product/" . $featured->slug) ?>'" style="cursor: pointer;">
+                                <img src="<?= base_url($imagePath) ?>" class="featured-img" alt="<?= esc($featured->product_name) ?>">
+                                <div class="featured-info">
+                                    <h4><?= esc($featured->product_name) ?></h4>
+                                    <div class="featured-price">₱<?= number_format($featured->price, 2) ?></div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p style="color: #666; font-style: italic;">More items coming soon...</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
