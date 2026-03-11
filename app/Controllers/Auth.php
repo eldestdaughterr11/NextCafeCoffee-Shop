@@ -64,7 +64,9 @@ class Auth extends BaseController
             'username' => $this->request->getPost('username'),
             'email' => $this->request->getPost('email'),
             'password' => md5($this->request->getPost('password')), // keep MD5 for customers
-            'role' => 'customer'
+            'role' => 'customer',
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
         ];
         $db->table('users')->insert($data);
 
