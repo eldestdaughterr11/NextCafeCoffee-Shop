@@ -24,8 +24,14 @@
             <h2>USER LOGIN</h2>
 
             <?php if (session()->getFlashdata('msg')): ?>
-                <div class="alert alert-danger" style="margin-bottom: 20px;">
+                <div class="alert alert-danger" style="margin-bottom: 20px; background: #fff5f5; color: #e53e3e; padding: 1rem; border-radius: 8px; border: 1px solid #fed7d7;">
                     <?= session()->getFlashdata('msg') ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($error)): ?>
+                <div class="alert alert-danger" style="margin-bottom: 20px; background: #fff5f5; color: #e53e3e; padding: 1rem; border-radius: 8px; border: 1px solid #fed7d7;">
+                    <?= $error ?>
                 </div>
             <?php endif; ?>
 

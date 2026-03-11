@@ -119,7 +119,7 @@ class Auth extends BaseController
             }
         }
 
-        return view('auth/login', ['error' => 'Invalid email or password']);
+        return view('auth/login', ['error' => 'invalid credentials please try again']);
     }
 
     public function adminLogin()
