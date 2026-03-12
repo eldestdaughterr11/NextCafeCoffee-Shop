@@ -114,6 +114,7 @@ class Auth extends BaseController
                 $session->set([
                     'user_id' => $user->id,
                     'username' => $user->username,
+                    'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
                     'logged_in' => true
@@ -165,6 +166,7 @@ class Auth extends BaseController
                 $session->set([
                     'user_id' => $user->id,
                     'username' => $user->username,
+                    'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
                     'logged_in' => true
