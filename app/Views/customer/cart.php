@@ -160,6 +160,16 @@ $grand_total = $cart_total + $tax_amount + $delivery_fee;
                             </select>
                         </div>
 
+                        <div class="form-group">
+                            <label>Check-in Date & Time (Optional)</label>
+                            <input type="datetime-local" name="checkin_time" class="styled-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Check-out Date & Time (Optional)</label>
+                            <input type="datetime-local" name="checkout_time" class="styled-input">
+                        </div>
+
                         <div class="summary-rows">
                             <div class="row">
                                 <span>Subtotal</span>

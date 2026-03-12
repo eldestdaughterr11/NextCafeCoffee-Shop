@@ -429,6 +429,8 @@ class Customer extends BaseController
         $shippingMethod = $this->request->getPost('shipping_method');
         $paymentMethod = $this->request->getPost('payment_method');
         $address = $this->request->getPost('address');
+        $checkinTime = $this->request->getPost('checkin_time');
+        $checkoutTime = $this->request->getPost('checkout_time');
 
         // Calculate totals
         $cartTotal = 0;
@@ -450,6 +452,8 @@ class Customer extends BaseController
             'shipping_method' => $shippingMethod,
             'payment_method'  => $paymentMethod,
             'address'         => $address,
+            'checkin_time'    => !empty($checkinTime) ? $checkinTime : null,
+            'checkout_time'   => !empty($checkoutTime) ? $checkoutTime : null,
             'created_at'      => date('Y-m-d H:i:s'),
             'updated_at'      => date('Y-m-d H:i:s')
         ];

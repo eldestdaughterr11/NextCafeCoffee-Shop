@@ -62,6 +62,18 @@
                     <h3>Delivery Address</h3>
                     <p><?= esc($order->address ?: 'N/A') ?></p>
                 </div>
+                <?php if ($order->checkin_time): ?>
+                    <div class="info-block">
+                        <h3>Check-in Time</h3>
+                        <p><?= date('F j, Y \a\t g:i a', strtotime($order->checkin_time)) ?></p>
+                    </div>
+                <?php endif; ?>
+                <?php if ($order->checkout_time): ?>
+                    <div class="info-block">
+                        <h3>Check-out Time</h3>
+                        <p><?= date('F j, Y \a\t g:i a', strtotime($order->checkout_time)) ?></p>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <h2>Order Items</h2>
