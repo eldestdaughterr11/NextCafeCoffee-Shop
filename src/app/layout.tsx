@@ -26,9 +26,9 @@ export default function RootLayout({
             {/* Sidebar logic: Wag ipakita kung Login o Register Page */}
             {!isAuthPage && !isAdminPath && <CustomerSidebar />}
             
-            <main className={`flex-grow min-h-screen ${(!isAuthPage && !isAdminPath) ? 'pl-72' : ''}`}>
+            <main className={`flex-grow min-h-screen pb-20 lg:pb-0 ${(!isAuthPage && !isAdminPath) ? 'lg:pl-72' : ''}`}>
               {/* Para sa Auth pages, wala tayong padding. Para sa iba, meron. */}
-              <div className={`${!isAuthPage ? 'p-8 lg:p-12' : ''}`}>
+              <div className={`${!isAuthPage ? 'p-4 pb-24 lg:p-8 lg:pb-8' : ''}`}>
                 {children}
               </div>
             </main>

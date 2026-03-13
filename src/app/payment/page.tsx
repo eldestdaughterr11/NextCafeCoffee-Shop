@@ -129,7 +129,7 @@ export default function PaymentPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-12 px-6">
+    <div className="max-w-6xl mx-auto py-8 md:py-12 px-4 md:px-6">
       {/* Header */}
       <div className="flex items-center space-x-4 mb-8">
         <Link href="/delivery" className="p-3 bg-white border border-coffee-100 rounded-2xl hover:bg-cream-50 transition-all shadow-sm">
@@ -142,21 +142,21 @@ export default function PaymentPage() {
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-12">
-        <div className="flex items-center justify-between max-w-lg">
+      <div className="mb-10 md:mb-12">
+        <div className="flex items-center justify-between max-w-lg mx-auto md:mx-0">
           <div className="flex flex-col items-center">
-            <div className="w-12 h-12 rounded-full bg-green-600 text-white flex items-center justify-center font-black text-lg shadow-lg">✓</div>
-            <span className="text-xs font-black text-green-600 mt-2 uppercase tracking-widest">Details</span>
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-green-600 text-white flex items-center justify-center font-black text-base md:text-lg shadow-lg">✓</div>
+            <span className="text-[10px] md:text-xs font-black text-green-600 mt-2 uppercase tracking-widest text-center">Details</span>
           </div>
-          <div className="flex-1 h-1 bg-green-500 mx-4 rounded-full"></div>
+          <div className="flex-1 h-1 bg-green-500 mx-2 md:mx-4 rounded-full"></div>
           <div className="flex flex-col items-center">
-            <div className="w-12 h-12 rounded-full bg-green-600 text-white flex items-center justify-center font-black text-lg shadow-lg">✓</div>
-            <span className="text-xs font-black text-green-600 mt-2 uppercase tracking-widest">Delivery</span>
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-green-600 text-white flex items-center justify-center font-black text-base md:text-lg shadow-lg">✓</div>
+            <span className="text-[10px] md:text-xs font-black text-green-600 mt-2 uppercase tracking-widest text-center">Delivery</span>
           </div>
-          <div className="flex-1 h-1 bg-[#007DFE] mx-4 rounded-full"></div>
+          <div className="flex-1 h-1 bg-[#007DFE] mx-2 md:mx-4 rounded-full"></div>
           <div className="flex flex-col items-center">
-            <div className="w-12 h-12 rounded-full bg-[#007DFE] text-white flex items-center justify-center font-black text-lg shadow-lg shadow-[#007DFE]/30">3</div>
-            <span className="text-xs font-black text-[#007DFE] mt-2 uppercase tracking-widest">Payment</span>
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#007DFE] text-white flex items-center justify-center font-black text-base md:text-lg shadow-lg shadow-[#007DFE]/30">3</div>
+            <span className="text-[10px] md:text-xs font-black text-[#007DFE] mt-2 uppercase tracking-widest text-center">Payment</span>
           </div>
         </div>
       </div>
@@ -168,7 +168,7 @@ export default function PaymentPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-[#007DFE] to-[#0055CC] p-8 rounded-[2.5rem] text-white shadow-2xl shadow-[#007DFE]/20 relative overflow-hidden"
+            className="bg-gradient-to-br from-[#007DFE] to-[#0055CC] p-6 md:p-8 rounded-[2.5rem] text-white shadow-2xl shadow-[#007DFE]/20 relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -translate-x-10 -translate-y-20"></div>
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-x-[-40%] translate-y-[40%]"></div>
@@ -188,7 +188,7 @@ export default function PaymentPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white p-10 rounded-[2.5rem] border border-coffee-50 shadow-sm space-y-6"
+            className="bg-white p-6 md:p-10 rounded-[2.5rem] border border-coffee-50 shadow-sm space-y-6"
           >
             <h2 className="text-2xl font-black text-coffee-950 flex items-center space-x-3">
               <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
@@ -298,7 +298,7 @@ export default function PaymentPage() {
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-[#2D1B14] p-10 rounded-[3rem] text-white shadow-2xl sticky top-8"
+            className="bg-[#2D1B14] p-6 md:p-10 rounded-[3rem] text-white shadow-2xl sticky top-8"
           >
             <h2 className="text-2xl font-black mb-8 italic uppercase tracking-widest">Your Order</h2>
             

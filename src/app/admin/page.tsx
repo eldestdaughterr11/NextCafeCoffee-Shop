@@ -52,7 +52,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="flex min-h-screen bg-[#FDF8F3]">
       <AdminSidebar />
-      <main className="flex-grow md:pl-64 p-4 md:p-8">
+      <main className="flex-grow md:pl-64 p-4 md:p-8 pb-24 md:pb-8">
         <div className="flex justify-between items-center mb-10">
           <h1 className="text-3xl font-black text-coffee-950">Dashboard Overview</h1>
           <div className="flex items-center space-x-4">
