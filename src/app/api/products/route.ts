@@ -17,6 +17,22 @@ export async function GET(request: Request) {
       }
     });
 
+    // Auto-fix images for production databases silently
+    for (const p of products) {
+      if (p.name.includes('Banana Bread') && p.image !== '/images/bananabread.jpg') {
+        await prisma.product.update({ where: { id: p.id }, data: { image: '/images/bananabread.jpg' } });
+        p.image = '/images/bananabread.jpg';
+      }
+      if (p.name.includes('Matcha Latte') && p.image !== '/images/matchalatte.jpg') {
+        await prisma.product.update({ where: { id: p.id }, data: { image: '/images/matchalatte.jpg' } });
+        p.image = '/images/matchalatte.jpg';
+      }
+      if (p.name.includes('Chocolate Muffin') && p.image !== '/images/chocomuffin.jpg') {
+        await prisma.product.update({ where: { id: p.id }, data: { image: '/images/chocomuffin.jpg' } });
+        p.image = '/images/chocomuffin.jpg';
+      }
+    }
+
     // Balik laging array, kahit empty
     return NextResponse.json(products || []);
   } catch (error) {
