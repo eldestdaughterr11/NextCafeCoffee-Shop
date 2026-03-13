@@ -10,7 +10,7 @@ async function main() {
       description: "A signature blend with a touch of sweetness and saltiness, crafted for Saira.",
       price: 165.00,
       category: "Specialty",
-      image: "/images/products/sairas-machiatta.jpg",
+      image: "/images/Saira's Salted Machiatta.png",
       status: "available"
     },
     {
@@ -19,7 +19,7 @@ async function main() {
       description: "A fiery and sweet caramel delight that lives up to its name. Nell's favorite.",
       price: 160.00,
       category: "Specialty",
-      image: "/images/products/nells-caramel.jpg",
+      image: "/images/Nell's Caramel Hell.png",
       status: "available"
     },
     {
@@ -28,7 +28,7 @@ async function main() {
       description: "Creamy, smooth, and inspired by the classic Filipino dessert. Van's special.",
       price: 170.00,
       category: "Specialty",
-      image: "/images/products/vans-leche-flan.jpg",
+      image: "/images/van's flat leche flan.png",
       status: "available"
     },
     {
@@ -37,7 +37,7 @@ async function main() {
       description: "Bold dark chocolate with a masculine punch. Martin's signature brew.",
       price: 160.00,
       category: "Specialty",
-      image: "/images/products/martins-choco.jpg",
+      image: "/images/Martin's black choco.png",
       status: "available"
     }
   ];
