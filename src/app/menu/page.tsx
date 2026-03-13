@@ -64,6 +64,7 @@ export default function MenuPage() {
 
   const categories = [
     { id: 'all', label: 'All Items', icon: LayoutGrid },
+    { id: 'Specialty', label: 'Specialty', icon: () => <span className="text-xl">⭐</span> },
     { id: 'Cold Brew', label: 'Coffee', icon: Coffee },
     { id: 'Milk Based', label: 'Cappuccino', icon: Coffee },
     { id: 'Pastries', label: 'Pastries', icon: Cookie },
@@ -152,23 +153,56 @@ export default function MenuPage() {
         </div>
       ) : (
         <AnimatePresence mode="wait">
-          {filteredProducts.length > 0 ? (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
-            >
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </motion.div>
-          ) : (
-            <div className="py-32 text-center bg-white rounded-[3rem] border border-dashed border-coffee-100">
-               <Coffee className="h-16 w-16 text-coffee-100 mx-auto mb-6" />
-               <h2 className="text-2xl font-bold text-coffee-950">No items available yet</h2>
-               <p className="text-coffee-500">Check back later or try a different category.</p>
-            </div>
-          )}
+          <div className="space-y-16">
+            {/* Signature Series Section (Only show on 'all') */}
+            {filter === 'all' && search === '' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-8"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="h-px bg-coffee-100 flex-grow"></div>
+                  <h2 className="text-2xl font-black text-coffee-950 italic uppercase tracking-[0.3em] px-4">Signature Series</h2>
+                  <div className="h-px bg-coffee-100 flex-grow"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                  {products.filter(p => p.category === 'Specialty').map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {filteredProducts.length > 0 ? (
+              <div className="space-y-8">
+                {filter === 'all' && (
+                  <div className="flex items-center space-x-4">
+                    <div className="h-px bg-coffee-100 flex-grow"></div>
+                    <h2 className="text-sm font-black text-coffee-300 uppercase tracking-[0.2em] px-4">Our Selection</h2>
+                    <div className="h-px bg-coffee-100 flex-grow"></div>
+                  </div>
+                )}
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+                >
+                  {filteredProducts
+                    .filter(p => filter !== 'all' || p.category !== 'Specialty')
+                    .map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </motion.div>
+              </div>
+            ) : (
+              <div className="py-32 text-center bg-white rounded-[3rem] border border-dashed border-coffee-100">
+                 <Coffee className="h-16 w-16 text-coffee-100 mx-auto mb-6" />
+                 <h2 className="text-2xl font-bold text-coffee-950">No items available yet</h2>
+                 <p className="text-coffee-500">Check back later or try a different category.</p>
+              </div>
+            )}
+          </div>
         </AnimatePresence>
       )}
     </div>
