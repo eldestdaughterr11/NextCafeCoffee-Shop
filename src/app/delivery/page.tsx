@@ -37,15 +37,22 @@ export default function DeliveryPage() {
   const [customDistance, setCustomDistance] = useState('');
   const [shippingFee, setShippingFee] = useState(0);
   const [currentEta, setCurrentEta] = useState('');
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  
+  const checkoutKey = `nextcafe-checkout-${userEmail || 'guest'}`;
+  const deliveryKey = `nextcafe-delivery-${userEmail || 'guest'}`;
 
   // Check if checkout data exists
   useEffect(() => {
-    const checkout = localStorage.getItem('nextcafe-checkout');
+    const email = localStorage.getItem('user_email');
+    setUserEmail(email);
+
+    const checkout = localStorage.getItem(`nextcafe-checkout-${email || 'guest'}`);
     if (!checkout && cart.length > 0) {
       router.push('/checkout');
     }
     // Load saved delivery data if coming back from payment
-    const saved = localStorage.getItem('nextcafe-delivery');
+    const saved = localStorage.getItem(`nextcafe-delivery-${email || 'guest'}`);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -54,7 +61,7 @@ export default function DeliveryPage() {
         setCustomDistance(parsed.customDistance || '');
       } catch {}
     }
-  }, []);
+  }, [userEmail]);
 
   // Calculate shipping fee based on distance
   useEffect(() => {
@@ -89,7 +96,7 @@ export default function DeliveryPage() {
   const handleNext = () => {
     if (deliveryMethod === 'delivery' && shippingFee === 0) return;
     // Save delivery data
-    localStorage.setItem('nextcafe-delivery', JSON.stringify({
+    localStorage.setItem(deliveryKey, JSON.stringify({
       deliveryMethod,
       selectedLocation: deliveryMethod === 'delivery' ? selectedLocation : '',
       customDistance: deliveryMethod === 'delivery' ? customDistance : '',

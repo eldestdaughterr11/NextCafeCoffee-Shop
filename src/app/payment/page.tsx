@@ -20,11 +20,18 @@ export default function PaymentPage() {
   const [deliveryMethod, setDeliveryMethod] = useState('delivery');
   const [paymentMethod, setPaymentMethod] = useState('gcash');
   const [checkoutData, setCheckoutData] = useState<any>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  const checkoutKey = `nextcafe-checkout-${userEmail || 'guest'}`;
+  const deliveryKey = `nextcafe-delivery-${userEmail || 'guest'}`;
 
   // Load checkout + delivery data
   useEffect(() => {
-    const checkout = localStorage.getItem('nextcafe-checkout');
-    const delivery = localStorage.getItem('nextcafe-delivery');
+    const email = localStorage.getItem('user_email');
+    setUserEmail(email);
+
+    const checkout = localStorage.getItem(`nextcafe-checkout-${email || 'guest'}`);
+    const delivery = localStorage.getItem(`nextcafe-delivery-${email || 'guest'}`);
     
     if (!checkout || !delivery) {
       if (cart.length > 0) {
@@ -39,7 +46,7 @@ export default function PaymentPage() {
       setShippingFee(deliveryData.shippingFee || 0);
       setDeliveryMethod(deliveryData.deliveryMethod || 'delivery');
     } catch {}
-  }, []);
+  }, [userEmail]);
 
   const total = subtotal + shippingFee;
 
@@ -74,8 +81,8 @@ export default function PaymentPage() {
         setComplete(true);
         clearCart();
         // Clean up localStorage
-        localStorage.removeItem('nextcafe-checkout');
-        localStorage.removeItem('nextcafe-delivery');
+        localStorage.removeItem(checkoutKey);
+        localStorage.removeItem(deliveryKey);
       } else {
         alert('Failed to place order. Please try again.');
       }
@@ -263,13 +270,20 @@ export default function PaymentPage() {
             </div>
 
             {/* GCash Number */}
-            <div className="bg-[#007DFE]/5 border-2 border-[#007DFE]/20 rounded-2xl p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-coffee-400 font-medium">Send money to</p>
-                  <p className="text-3xl font-black text-[#007DFE] mt-1">{GCASH_NUMBER}</p>
-                  <p className="text-xs text-coffee-400 mt-1">Account: <span className="font-bold">{GCASH_NAME}</span></p>
-                </div>
+              <div className="bg-[#007DFE]/5 border-2 border-[#007DFE]/20 rounded-2xl p-6 space-y-4">
+                {checkoutData && (
+                  <div className="border-b border-blue-100 pb-4 mb-2">
+                    <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Paying from</p>
+                    <p className="text-sm font-black text-coffee-800">{checkoutData.name}</p>
+                    <p className="text-xs font-bold text-[#007DFE]">{checkoutData.phone}</p>
+                  </div>
+                )}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-coffee-400 font-medium">Send money to</p>
+                    <p className="text-3xl font-black text-[#007DFE] mt-1">{GCASH_NUMBER}</p>
+                    <p className="text-xs text-coffee-400 mt-1">Account: <span className="font-bold">{GCASH_NAME}</span></p>
+                  </div>
                 <button 
                   onClick={copyNumber}
                   className="p-3 bg-[#007DFE]/10 rounded-xl hover:bg-[#007DFE]/20 transition-all"
@@ -298,6 +312,12 @@ export default function PaymentPage() {
                 />
               </div>
             </form>
+
+            {checkoutData && (
+               <p className="text-[10px] text-center text-blue-300 font-medium">
+                  We will verify the payment from {checkoutData.phone}
+               </p>
+            )}
 
             <p className="text-xs text-coffee-400 text-center">
               🔒 Secure payment via GCash — the most popular e-wallet in the Philippines

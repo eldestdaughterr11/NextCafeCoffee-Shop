@@ -16,21 +16,33 @@ export default function CheckoutPage() {
     phone: '',
     address: '',
   });
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const checkoutKey = `nextcafe-checkout-${userEmail || 'guest'}`;
 
   useEffect(() => {
+    const email = localStorage.getItem('user_email');
+    setUserEmail(email);
+
     const storedName = localStorage.getItem('user_name');
     if (storedName) {
       setFormData(prev => ({ ...prev, name: storedName }));
     }
-    // Load saved data if user comes back
-    const saved = localStorage.getItem('nextcafe-checkout');
+  }, []);
+
+  // Separate effect to load saved data once key is ready
+  useEffect(() => {
+    if (!userEmail) {
+       const email = localStorage.getItem('user_email');
+       if (email) setUserEmail(email);
+    }
+    const saved = localStorage.getItem(checkoutKey);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         setFormData(prev => ({ ...prev, ...parsed }));
       } catch {}
     }
-  }, []);
+  }, [userEmail, checkoutKey]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -40,7 +52,7 @@ export default function CheckoutPage() {
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
     // Save form data to localStorage for next steps
-    localStorage.setItem('nextcafe-checkout', JSON.stringify(formData));
+    localStorage.setItem(checkoutKey, JSON.stringify(formData));
     router.push('/delivery');
   };
 
