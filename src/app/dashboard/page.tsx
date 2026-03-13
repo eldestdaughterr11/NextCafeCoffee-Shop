@@ -6,17 +6,42 @@ import Link from 'next/link';
 
 export default function CustomerDashboard() {
   const [userName, setUserName] = useState('Valued Member');
+  const [dashboardStats, setDashboardStats] = useState({
+    totalOrders: 0,
+    points: 0,
+    favoriteDrink: 'None yet',
+    totalSpent: 0
+  });
+  const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
     const name = localStorage.getItem('user_name');
+    const email = localStorage.getItem('user_email');
     if (name) setUserName(name);
+
+    if (email) {
+      fetch(`/api/dashboard/stats?email=${email}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.error) {
+            setDashboardStats(data);
+          }
+        })
+        .catch(err => console.error(err))
+        .finally(() => setLoadingStats(false));
+    } else {
+      setLoadingStats(false);
+    }
   }, []);
 
   const stats = [
-    { title: 'Total Orders', value: '0', icon: ShoppingBag, color: 'bg-blue-500' },
-    { title: 'Points Earned', value: '0', icon: Star, color: 'bg-yellow-500' },
-    { title: 'Favorite Drink', value: 'None yet', icon: Coffee, color: 'bg-orange-500' },
+    { title: 'Total Orders', value: loadingStats ? '...' : dashboardStats.totalOrders.toString(), icon: ShoppingBag, color: 'bg-blue-500' },
+    { title: 'Points Earned', value: loadingStats ? '...' : dashboardStats.points.toString(), icon: Star, color: 'bg-yellow-500' },
+    { title: 'Favorite Drink', value: loadingStats ? '...' : dashboardStats.favoriteDrink, icon: Coffee, color: 'bg-orange-500' },
   ];
+
+  const progressPercentage = Math.min((dashboardStats.points / 500) * 100, 100);
+  const pointsRemaining = Math.max(500 - dashboardStats.points, 0);
 
   return (
     <div className="max-w-6xl mx-auto py-8">
@@ -70,9 +95,18 @@ export default function CustomerDashboard() {
               <h2 className="text-2xl font-black text-coffee-950">Earning Progress</h2>
            </div>
            <div className="w-full bg-cream-50 h-4 rounded-full overflow-hidden mb-4">
-              <div className="bg-[#C69276] h-full w-[0%] rounded-full shadow-lg shadow-[#C69276]/30"></div>
+              <div 
+                className="bg-[#C69276] h-full rounded-full shadow-lg shadow-[#C69276]/30 transition-all duration-1000"
+                style={{ width: `${progressPercentage}%` }}
+              ></div>
            </div>
-           <p className="text-coffee-500 font-medium">You need <span className="text-[#C69276] font-bold">500 points</span> for your next free drink!</p>
+           <p className="text-coffee-500 font-medium">
+             {pointsRemaining > 0 ? (
+               <>You need <span className="text-[#C69276] font-bold">{pointsRemaining} points</span> for your next free drink!</>
+             ) : (
+               <span className="text-green-600 font-bold">You have a free drink waiting! 🎁</span>
+             )}
+           </p>
         </div>
       </div>
     </div>
