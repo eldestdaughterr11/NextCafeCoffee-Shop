@@ -139,9 +139,6 @@ export default function LoginPage() {
               <p className="text-coffee-950 font-medium">
                 Don't have account? <Link href="/register" className="text-[#6366F1] font-bold hover:underline">Register Now</Link>
               </p>
-              <p className="text-coffee-400 text-sm font-medium">
-                Are you an admin? <Link href="/admin/login" className="text-red-500 font-bold hover:underline">Admin Login →</Link>
-              </p>
             </div>
           </div>
         </div>
