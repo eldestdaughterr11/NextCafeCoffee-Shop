@@ -20,9 +20,24 @@ export default function EditProductPage() {
     status: 'available'
   });
 
+  const convertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
+
+    if (file.size > 1024 * 1024) {
+      alert("Image is too large! Please use a file smaller than 1MB.");
+      return;
+    }
+
     setUploadingImage(true);
 
     const data = new FormData();
@@ -37,11 +52,17 @@ export default function EditProductPage() {
       if (result.success) {
         setFormData(prev => ({ ...prev, image: result.url }));
       } else {
-        alert(result.error || 'Upload failed');
+        const base64 = await convertToBase64(file);
+        setFormData(prev => ({ ...prev, image: base64 }));
       }
     } catch (err) {
-      console.error(err);
-      alert("Error uploading image");
+      console.error("Upload error, using fallback:", err);
+      try {
+        const base64 = await convertToBase64(file);
+        setFormData(prev => ({ ...prev, image: base64 }));
+      } catch (innerErr) {
+        alert("Error processing image");
+      }
     } finally {
       setUploadingImage(false);
     }

@@ -35,7 +35,7 @@ model Product {
   description String?     @db.Text
   price       Decimal     @db.Decimal(10, 2)
   category    String
-  image       String?
+  image       String?     @db.LongText
   status      String      @default("available")
   createdAt   DateTime    @default(now()) @map("created_at")
   updatedAt   DateTime    @updatedAt @map("updated_at")
