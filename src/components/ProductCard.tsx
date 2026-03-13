@@ -28,10 +28,9 @@ export default function ProductCard({ product }: ProductCardProps) {
       viewport={{ once: true }}
       className="bg-white rounded-[2rem] overflow-hidden border border-coffee-50 shadow-sm hover:shadow-2xl transition-all group flex flex-col"
     >
-      {/* Image Container */}
       <div className="h-56 overflow-hidden relative">
         <img 
-          src={product.image || '/images/default.png'} 
+          src={product.name.toLowerCase().includes('banana bread') ? '/images/bananabread.jpg' : (product.image || '/images/default.png')} 
           alt={product.name || 'Product'} 
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
         />

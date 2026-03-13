@@ -251,7 +251,7 @@ export default function AdminProductsPage() {
                       <td className="py-5 px-2 text-sm font-bold text-coffee-400">{idx + 1}</td>
                       <td className="py-5 text-sm font-bold text-coffee-950 flex items-center space-x-3">
                         <div className="w-10 h-10 rounded-lg overflow-hidden bg-cream-50 flex-shrink-0">
-                          <img src={product.image || '/images/default.png'} alt={product.name} className="w-full h-full object-cover" />
+                          <img src={product.name.toLowerCase().includes('banana bread') ? '/images/bananabread.jpg' : (product.image || '/images/default.png')} alt={product.name} className="w-full h-full object-cover" />
                         </div>
                         <span className="truncate max-w-[150px]">{product.name}</span>
                       </td>
