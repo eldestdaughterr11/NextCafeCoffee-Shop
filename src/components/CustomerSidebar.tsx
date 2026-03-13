@@ -18,6 +18,12 @@ export default function CustomerSidebar() {
   const router = useRouter();
 
   const handleLogout = () => {
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('nextcafe-cart');
+    localStorage.removeItem('nextcafe-checkout');
+    localStorage.removeItem('nextcafe-delivery');
     router.push('/login');
   };
 

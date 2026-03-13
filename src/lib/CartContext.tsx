@@ -22,23 +22,45 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  // Load cart from local storage on mount
+  // Key shifts whenever userEmail changes
+  const cartKey = `nextcafe-cart-${userEmail || 'guest'}`;
+
+  // Monitor for user changes in localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem('nextcafe-cart');
+    const checkUser = () => {
+      const email = localStorage.getItem('user_email');
+      if (email !== userEmail) {
+        setUserEmail(email);
+      }
+    };
+    
+    checkUser();
+    const interval = setInterval(checkUser, 1000);
+    return () => clearInterval(interval);
+  }, [userEmail]);
+
+  // Load cart when the key (user) changes
+  useEffect(() => {
+    const savedCart = localStorage.getItem(cartKey);
     if (savedCart) {
       try {
         setCart(JSON.parse(savedCart));
       } catch (e) {
-        console.error("Failed to parse cart", e);
+        setCart([]);
       }
+    } else {
+      setCart([]);
     }
-  }, []);
+  }, [cartKey]);
 
-  // Save cart to local storage whenever it changes
+  // Save changes to current user's cart
   useEffect(() => {
-    localStorage.setItem('nextcafe-cart', JSON.stringify(cart));
-  }, [cart]);
+    if (cart.length > 0 || localStorage.getItem(cartKey)) {
+      localStorage.setItem(cartKey, JSON.stringify(cart));
+    }
+  }, [cart, cartKey]);
 
   const addToCart = (product: any) => {
     const qtyToAdd = product.quantity || 1;

@@ -13,6 +13,8 @@ export default function PaymentPage() {
   const [complete, setComplete] = useState(false);
   const [gcashRef, setGcashRef] = useState('');
   const [copied, setCopied] = useState(false);
+  const GCASH_NUMBER = "0961 319 0917"; // Change this to your actual GCash number
+  const GCASH_NAME = "NextCafe Coffee Shop";
 
   const [shippingFee, setShippingFee] = useState(0);
   const [deliveryMethod, setDeliveryMethod] = useState('delivery');
@@ -42,7 +44,7 @@ export default function PaymentPage() {
   const total = subtotal + shippingFee;
 
   const copyNumber = () => {
-    navigator.clipboard.writeText('09123456789');
+    navigator.clipboard.writeText(GCASH_NUMBER.replace(/\s+/g, ''));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -265,8 +267,8 @@ export default function PaymentPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-coffee-400 font-medium">Send money to</p>
-                  <p className="text-3xl font-black text-[#007DFE] mt-1">0912 345 6789</p>
-                  <p className="text-xs text-coffee-400 mt-1">Account: <span className="font-bold">NextCafe Coffee Shop</span></p>
+                  <p className="text-3xl font-black text-[#007DFE] mt-1">{GCASH_NUMBER}</p>
+                  <p className="text-xs text-coffee-400 mt-1">Account: <span className="font-bold">{GCASH_NAME}</span></p>
                 </div>
                 <button 
                   onClick={copyNumber}
