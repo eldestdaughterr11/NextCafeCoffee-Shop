@@ -13,9 +13,9 @@ export default function CustomerDashboard() {
   }, []);
 
   const stats = [
-    { title: 'Total Orders', value: '12', icon: ShoppingBag, color: 'bg-blue-500' },
-    { title: 'Points Earned', value: '450', icon: Star, color: 'bg-yellow-500' },
-    { title: 'Favorite Drink', value: 'Caramel Macchiato', icon: Coffee, color: 'bg-orange-500' },
+    { title: 'Total Orders', value: '0', icon: ShoppingBag, color: 'bg-blue-500' },
+    { title: 'Points Earned', value: '0', icon: Star, color: 'bg-yellow-500' },
+    { title: 'Favorite Drink', value: 'None yet', icon: Coffee, color: 'bg-orange-500' },
   ];
 
   return (
@@ -70,9 +70,9 @@ export default function CustomerDashboard() {
               <h2 className="text-2xl font-black text-coffee-950">Earning Progress</h2>
            </div>
            <div className="w-full bg-cream-50 h-4 rounded-full overflow-hidden mb-4">
-              <div className="bg-[#C69276] h-full w-[75%] rounded-full shadow-lg shadow-[#C69276]/30"></div>
+              <div className="bg-[#C69276] h-full w-[0%] rounded-full shadow-lg shadow-[#C69276]/30"></div>
            </div>
-           <p className="text-coffee-500 font-medium">You are <span className="text-[#C69276] font-bold">50 points</span> away from your next free drink!</p>
+           <p className="text-coffee-500 font-medium">You need <span className="text-[#C69276] font-bold">500 points</span> for your next free drink!</p>
         </div>
       </div>
     </div>

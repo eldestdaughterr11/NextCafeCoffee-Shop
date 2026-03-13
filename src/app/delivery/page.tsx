@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/lib/CartContext';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Truck, Navigation, MapPin, Clock, Shield, Package } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Truck, Navigation, MapPin, Clock, Shield, Package, Store } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -32,6 +32,7 @@ export default function DeliveryPage() {
   const { cart, subtotal } = useCart();
   const router = useRouter();
 
+  const [deliveryMethod, setDeliveryMethod] = useState('delivery'); // 'delivery' or 'pickup'
   const [selectedLocation, setSelectedLocation] = useState('');
   const [customDistance, setCustomDistance] = useState('');
   const [shippingFee, setShippingFee] = useState(0);
@@ -48,6 +49,7 @@ export default function DeliveryPage() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        setDeliveryMethod(parsed.deliveryMethod || 'delivery');
         setSelectedLocation(parsed.selectedLocation || '');
         setCustomDistance(parsed.customDistance || '');
       } catch {}
@@ -56,6 +58,12 @@ export default function DeliveryPage() {
 
   // Calculate shipping fee based on distance
   useEffect(() => {
+    if (deliveryMethod === 'pickup') {
+      setShippingFee(0);
+      setCurrentEta('Ready in 15 mins');
+      return;
+    }
+
     const loc = presetLocations.find(l => l.name === selectedLocation);
     if (!loc) {
       setShippingFee(0);
@@ -76,14 +84,15 @@ export default function DeliveryPage() {
     const rate = shippingRates.find(r => distance <= r.maxKm);
     setShippingFee(rate?.fee || 179);
     setCurrentEta(rate?.eta || '60-90 min');
-  }, [selectedLocation, customDistance]);
+  }, [selectedLocation, customDistance, deliveryMethod]);
 
   const handleNext = () => {
-    if (shippingFee === 0) return;
+    if (deliveryMethod === 'delivery' && shippingFee === 0) return;
     // Save delivery data
     localStorage.setItem('nextcafe-delivery', JSON.stringify({
-      selectedLocation,
-      customDistance,
+      deliveryMethod,
+      selectedLocation: deliveryMethod === 'delivery' ? selectedLocation : '',
+      customDistance: deliveryMethod === 'delivery' ? customDistance : '',
       shippingFee,
     }));
     router.push('/payment');
@@ -137,7 +146,35 @@ export default function DeliveryPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
         {/* Left: Delivery Selection */}
         <div className="space-y-8">
-          {/* Lalamove Partner Badge */}
+          {/* Method Selection */}
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => setDeliveryMethod('delivery')}
+              className={`p-6 rounded-3xl border-2 flex flex-col items-center justify-center space-y-3 transition-all ${
+                deliveryMethod === 'delivery' 
+                ? 'border-orange-500 bg-orange-50 text-orange-600 shadow-xl shadow-orange-500/10' 
+                : 'border-coffee-100 bg-white text-coffee-400 hover:bg-cream-50'
+              }`}
+            >
+              <Truck className="h-8 w-8" />
+              <span className="font-bold">Delivery</span>
+            </button>
+            <button
+              onClick={() => setDeliveryMethod('pickup')}
+              className={`p-6 rounded-3xl border-2 flex flex-col items-center justify-center space-y-3 transition-all ${
+                deliveryMethod === 'pickup' 
+                ? 'border-green-500 bg-green-50 text-green-600 shadow-xl shadow-green-500/10' 
+                : 'border-coffee-100 bg-white text-coffee-400 hover:bg-cream-50'
+              }`}
+            >
+              <Store className="h-8 w-8" />
+              <span className="font-bold">Pick-up</span>
+            </button>
+          </div>
+
+          {deliveryMethod === 'delivery' ? (
+            <>
+              {/* Lalamove Partner Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -272,6 +309,20 @@ export default function DeliveryPage() {
               ))}
             </div>
           </motion.div>
+          </>) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-green-50 p-8 rounded-[2.5rem] border border-green-200 text-center"
+            >
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Store className="h-10 w-10 text-green-600" />
+              </div>
+              <h3 className="text-2xl font-black text-green-800 mb-2">Pick-up at Store</h3>
+              <p className="text-green-600 font-medium">Free of charge. Ready in 15 minutes.</p>
+              <p className="text-sm text-green-600/70 mt-4">NextCafe Branch, FEU Tech, Manila</p>
+            </motion.div>
+          )}
 
           {/* Action Buttons */}
           <motion.div
@@ -286,7 +337,7 @@ export default function DeliveryPage() {
             </Link>
             <button 
               onClick={handleNext}
-              disabled={shippingFee === 0}
+              disabled={deliveryMethod === 'delivery' && shippingFee === 0}
               className="flex-grow bg-[#C69276] text-white py-6 rounded-2xl font-black text-xl hover:bg-[#B68A5D] transition-all shadow-2xl shadow-[#C69276]/20 active:scale-95 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:scale-100"
             >
               <span>PROCEED TO PAYMENT</span>
@@ -328,11 +379,11 @@ export default function DeliveryPage() {
               </div>
               <div className="flex justify-between text-white/60 font-medium">
                 <span className="flex items-center space-x-2">
-                  <Truck className="h-4 w-4 text-orange-400" />
-                  <span>Lalamove Shipping</span>
+                  {deliveryMethod === 'delivery' ? <Truck className="h-4 w-4 text-orange-400" /> : <Store className="h-4 w-4 text-green-400" />}
+                  <span>{deliveryMethod === 'delivery' ? 'Lalamove Shipping' : 'Store Pick-up'}</span>
                 </span>
-                <span className={shippingFee > 0 ? 'text-orange-400 font-bold' : ''}>
-                  {shippingFee > 0 ? `₱${shippingFee.toFixed(2)}` : '—'}
+                <span className={shippingFee > 0 ? 'text-orange-400 font-bold' : 'text-green-400 font-bold'}>
+                  {deliveryMethod === 'delivery' ? (shippingFee > 0 ? `₱${shippingFee.toFixed(2)}` : '—') : 'FREE'}
                 </span>
               </div>
               <div className="flex justify-between text-2xl font-black pt-4 border-t border-white/5">

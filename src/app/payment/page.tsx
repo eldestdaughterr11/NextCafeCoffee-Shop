@@ -15,6 +15,8 @@ export default function PaymentPage() {
   const [copied, setCopied] = useState(false);
 
   const [shippingFee, setShippingFee] = useState(0);
+  const [deliveryMethod, setDeliveryMethod] = useState('delivery');
+  const [paymentMethod, setPaymentMethod] = useState('gcash');
   const [checkoutData, setCheckoutData] = useState<any>(null);
 
   // Load checkout + delivery data
@@ -33,6 +35,7 @@ export default function PaymentPage() {
       setCheckoutData(JSON.parse(checkout));
       const deliveryData = JSON.parse(delivery);
       setShippingFee(deliveryData.shippingFee || 0);
+      setDeliveryMethod(deliveryData.deliveryMethod || 'delivery');
     } catch {}
   }, []);
 
@@ -46,7 +49,7 @@ export default function PaymentPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (cart.length === 0 || !gcashRef) return;
+    if (cart.length === 0 || (paymentMethod === 'gcash' && !gcashRef)) return;
 
     setLoading(true);
 
@@ -56,8 +59,9 @@ export default function PaymentPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...checkoutData,
-          gcashRef,
-          paymentMethod: 'gcash',
+          gcashRef: paymentMethod === 'gcash' ? gcashRef : null,
+          paymentMethod,
+          deliveryMethod,
           items: cart,
           shippingFee,
           total,
@@ -164,6 +168,34 @@ export default function PaymentPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
         {/* Left: GCash Payment */}
         <div className="space-y-8">
+          {/* Method Selection */}
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => setPaymentMethod('gcash')}
+              className={`p-6 rounded-3xl border-2 flex flex-col items-center justify-center space-y-3 transition-all ${
+                paymentMethod === 'gcash' 
+                ? 'border-[#007DFE] bg-blue-50 text-[#007DFE] shadow-xl shadow-[#007DFE]/10' 
+                : 'border-coffee-100 bg-white text-coffee-400 hover:bg-cream-50'
+              }`}
+            >
+              <img src="/images/gcash-logo.png" alt="GCash" className="h-8 object-contain" />
+              <span className="font-bold">GCash</span>
+            </button>
+            <button
+              onClick={() => setPaymentMethod('cod')}
+              className={`p-6 rounded-3xl border-2 flex flex-col items-center justify-center space-y-3 transition-all ${
+                paymentMethod === 'cod' 
+                ? 'border-coffee-500 bg-coffee-50 text-coffee-600 shadow-xl shadow-coffee-500/10' 
+                : 'border-coffee-100 bg-white text-coffee-400 hover:bg-cream-50'
+              }`}
+            >
+              <Smartphone className="h-8 w-8" />
+              <span className="font-bold">Cash</span>
+            </button>
+          </div>
+
+          {paymentMethod === 'gcash' ? (
+          <>
           {/* GCash Header Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -269,6 +301,23 @@ export default function PaymentPage() {
               🔒 Secure payment via GCash — the most popular e-wallet in the Philippines
             </p>
           </motion.div>
+          </>) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white p-6 md:p-10 rounded-[2.5rem] border border-coffee-50 shadow-sm text-center"
+            >
+              <div className="w-20 h-20 bg-coffee-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Smartphone className="h-10 w-10 text-coffee-600" />
+              </div>
+              <h3 className="text-2xl font-black text-coffee-950 mb-2">Pay in Cash</h3>
+              <p className="text-coffee-600 font-medium">Please prepare the exact amount of ₱{total.toFixed(2)}</p>
+              
+              <form onSubmit={handleSubmit} id="payment-form" className="mt-8">
+                {/* Submit handled by bottom button */}
+              </form>
+            </motion.div>
+          )}
 
           {/* Action Buttons */}
           <motion.div
@@ -284,11 +333,11 @@ export default function PaymentPage() {
             <button 
               form="payment-form"
               type="submit"
-              disabled={loading || !gcashRef}
-              className="flex-grow bg-[#007DFE] text-white py-6 rounded-2xl font-black text-xl hover:bg-[#0066CC] transition-all shadow-2xl shadow-[#007DFE]/20 active:scale-95 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:scale-100"
+              disabled={loading || (paymentMethod === 'gcash' && !gcashRef)}
+              className={`flex-grow ${paymentMethod === 'gcash' ? 'bg-[#007DFE] hover:bg-[#0066CC] shadow-[#007DFE]/20' : 'bg-[#C69276] hover:bg-[#B68A5D] shadow-[#C69276]/20'} text-white py-6 rounded-2xl font-black text-xl transition-all shadow-2xl active:scale-95 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:scale-100`}
             >
-              <img src="/images/gcash-logo.png" alt="" className="h-6 w-6 object-contain rounded" />
-              <span>{loading ? 'Processing...' : 'CONFIRM & PAY VIA GCASH'}</span>
+              {paymentMethod === 'gcash' && <img src="/images/gcash-logo.png" alt="" className="h-6 w-6 object-contain rounded" />}
+              <span>{loading ? 'Processing...' : (paymentMethod === 'gcash' ? 'CONFIRM & PAY VIA GCASH' : 'CONFIRM ORDER')}</span>
             </button>
           </motion.div>
         </div>
@@ -327,16 +376,22 @@ export default function PaymentPage() {
               <div className="flex justify-between text-white/60 font-medium">
                 <span className="flex items-center space-x-2">
                   <Truck className="h-4 w-4 text-orange-400" />
-                  <span>Lalamove Shipping</span>
+                  <span>{deliveryMethod === 'delivery' ? 'Lalamove Shipping' : 'Store Pick-up'}</span>
                 </span>
-                <span className="text-orange-400 font-bold">₱{shippingFee.toFixed(2)}</span>
+                <span className={shippingFee > 0 ? 'text-orange-400 font-bold' : ''}>
+                  {shippingFee > 0 ? `₱${shippingFee.toFixed(2)}` : 'FREE'}
+                </span>
               </div>
               <div className="flex justify-between text-white/60 font-medium">
                 <span className="flex items-center space-x-2">
-                  <img src="/images/gcash-logo.png" alt="GCash" className="h-4 w-4 object-contain rounded" />
+                  {paymentMethod === 'gcash' ? (
+                     <img src="/images/gcash-logo.png" alt="GCash" className="h-4 w-4 object-contain rounded" />
+                  ) : <Smartphone className="h-4 w-4" />}
                   <span>Payment</span>
                 </span>
-                <span className="text-[#007DFE] font-bold">GCash</span>
+                <span className={paymentMethod === 'gcash' ? 'text-[#007DFE] font-bold' : 'text-coffee-300 font-bold'}>
+                   {paymentMethod === 'gcash' ? 'GCash' : 'Cash'}
+                </span>
               </div>
               <div className="flex justify-between text-3xl font-black pt-4 border-t border-white/5">
                 <span className="italic uppercase">Total</span>
@@ -349,12 +404,14 @@ export default function PaymentPage() {
             </p>
           </motion.div>
 
-          <div className="bg-cream-50 p-8 rounded-[2.5rem] border border-dashed border-coffee-100 text-center mt-8">
-            <ShoppingBag className="h-8 w-8 text-coffee-200 mx-auto mb-4" />
-            <p className="text-coffee-400 font-medium text-sm leading-relaxed px-6">
-              Make sure you&apos;ve sent the correct GCash amount and entered the reference number before confirming.
-            </p>
-          </div>
+          {paymentMethod === 'gcash' && (
+            <div className="bg-cream-50 p-8 rounded-[2.5rem] border border-dashed border-coffee-100 text-center mt-8">
+              <ShoppingBag className="h-8 w-8 text-coffee-200 mx-auto mb-4" />
+              <p className="text-coffee-400 font-medium text-sm leading-relaxed px-6">
+                Make sure you&apos;ve sent the correct GCash amount and entered the reference number before confirming.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
