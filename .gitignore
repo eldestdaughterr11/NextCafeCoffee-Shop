@@ -1,5 +1,23 @@
+# Dependencies
 node_modules
-# Keep environment variables out of version control
-.env
 
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Build outputs
+.next
+out
+build
+dist
+
+# Prisma generated
 /src/generated/prisma
+
+# Misc
+*.pem
+*.zip
+isrgrootx1.pem
+NextCafe-Coffee-Shop.zip
+staged_diff.txt
